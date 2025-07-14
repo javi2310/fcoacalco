@@ -1,0 +1,95 @@
+library(tidyverse)
+library(data.table)
+library(googlesheets4)
+library(sf)
+library(leaflet)
+library(htmltools)
+
+
+muni<-read_sf("/Users/javier/Desktop/fsp/SHP-Municipios/Municipios.shp") %>% 
+  st_transform( "+init=epsg:4326")
+
+puntos_sel<-read_sheet("https://docs.google.com/spreadsheets/d/1Zw-6KMU2sJpAG8HlSaasqw421Xpo9r48-OAmrYLwDlM/edit?gid=0#gid=0") %>%
+  separate(`lat, long`, c("lat", "long"), sep=",") %>% 
+  mutate(Horas=substr(Horas, 12, 16)) %>% 
+  mutate(lat=as.numeric(lat), long=as.numeric(long))
+
+delitos<-fread("/Users/javier/Downloads/IDM_NM_ago24.csv", encoding = "Latin-1")
+names(delitos)[c(1,6)]<-c("años", "Bien juridico afectado")
+delitos<-delitos %>% filter(años==2024)
+
+delitos0<-delitos %>% 
+  select(`Cve. Municipio`, años, Modalidad, c(10:21)) %>% 
+  limpia_del() %>% rename(CVEGEO="Cve. Municipio")
+
+mapa1<-delitos0 %>%  group_by(CVEGEO, Modalidad) %>% 
+  summarise(n=sum(delitos, na.rm=T)) %>% 
+  arrange(desc(n)) %>% slice_head(n = 5) %>% 
+  mutate(delito=paste0( Modalidad ,": <b>", format(n, big.mark=","))) %>% 
+  group_by(CVEGEO) %>%  summarise(delito=toString(delito)) %>% 
+  mutate(delito=gsub(", ", "</b><br>", delito)) %>% 
+  left_join(delitos0 %>% group_by(CVEGEO) %>% summarise(tot=sum(delitos, na.rm = T))) %>% 
+  mutate(CVEGEO=as.character(CVEGEO)) %>%
+  mutate(CVEGEO=ifelse(nchar(CVEGEO)==4, paste0("0",CVEGEO ), CVEGEO )) %>% 
+  left_join(muni)
+
+coloresm <- c("#A3A9AC", "#32AC90")
+pal <- colorBin(coloresm, domain = mapa1 |> select(tot) |> pull() , bins = 4)
+mapa1 <- mapa1 |> mutate(coloresm= pal(tot), tot=format(tot, big.mark=","))
+
+leaflet(height=560, width=840) %>%
+  addTiles() %>%
+  setView( -99.15, 19.41, 9, zoom = 5) %>% 
+  addPolygons(data =mapa1$geometry, fillColor=mapa1$coloresm, fillOpacity = 0.7, color = "#8e2940", weight = 2, label = mapa1$Municipios, group = "Municipios",
+              popup = paste(paste0("<div style='font-size: 17px; font-weight:bold; text-align: center; background: white; padding: 4px; border-radius: 4px;'>", mapa1$CVEGEO, ": ", mapa1$Municipios,  "</div>"),
+                            "Total de delitos 2024: <b>", mapa1$tot, "</b><br>",
+                            "<div style='text-align: center; padding: 5px 0px 2px 0px;'><b>Top 5 de delitos:</b></div>",
+                            mapa1$delito)) %>% 
+  addAwesomeMarkers(data = puntos_sel, icon = crea_icon_number(puntos_sel$No, "red"),
+                    lat = ~lat, lng = ~long,  label = ~htmlEscape(lugar), group = "Puntos",
+                    popup = paste(paste0("<div style='font-size: 17px; font-weight:bold; text-align: center; background: white; padding: 4px; border-radius: 4px;'>","Unidad ",puntos_sel$lugar,  "</div>"),
+                                  puntos_sel$Ruta, "<br>")) 
+
+
+addLayersControl( baseGroups = c("Carto","Street Map", "World Imagen", "Dark Matter"),
+                  overlayGroups = c("Alcaldías", "Colonias","Farmacias", "Mapa de calor", "Metro", "MetroBus", "Radio", 
+                                    "Robo a Transeunte SV", "Robo a Transeunte CV"),
+                  options = layersControlOptions(collapsed = T),
+                  position = 'bottomleft') %>% 
+  addDrawToolbar(targetGroup='datos', position = "bottomleft",
+                 editOptions = editToolbarOptions(selectedPathOptions = selectedPathOptions())) %>% 
+  hideGroup(c("Radio", "Mapa de calor")) %>% 
+  addLegend(title = "Incidentes: Robo ", position = c("topright"), colors =  c(colores[1], colores[5],"yellow", "#ab83fe"),
+            labels = c("Robo a Transeunte SV", "Robo a Transeunte CV", "Metro", "Metrobus"))
+
+
+
+
+limpia_del<-function(delitos){
+  delitos<-delitos %>% 
+    pivot_longer(cols =c(Enero:Diciembre),
+                 names_to = c("mes"),
+                 values_to = "delitos") %>% 
+    mutate(mes=case_when(mes=="Enero"~"01-01",
+                         mes=="Febrero"~"02-01",
+                         mes=="Marzo"~"03-01",
+                         mes=="Abril"~"04-01",
+                         mes=="Mayo"~"05-01",
+                         mes=="Junio"~"06-01",
+                         mes=="Julio"~"07-01",
+                         mes=="Agosto"~"08-01",
+                         mes=="Septiembre"~"09-01",
+                         mes=="Octubre"~"10-01",
+                         mes=="Noviembre"~"11-01",
+                         mes=="Diciembre"~"12-01")) %>% 
+    mutate(mes=as.Date(paste(años, mes, sep="-")))   
+  return(delitos)}
+
+
+crea_icon_number<-function(number, colors){
+  icons <- awesomeIcons(
+    icon = 'ion-numeric',
+    markerColor = colors,
+    iconColor = 'white',
+    text = number)
+  return(icons)}
