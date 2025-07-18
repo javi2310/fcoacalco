@@ -12,8 +12,16 @@ params:
   mapa1: NA
   tabla2: NA
   tabla3: NA
+  tabla4: NA
   mapa_2: NA
 ---
+## Consideraciones técnicas: 
+<div class="container_col">
+- La información expuesta fue obtenida en el portal de datos abiertos del Gobierno de México (https://www.gob.mx/)
+- Se tienen un corte de análisis al 15 de junio del 2025
+- La farmacia 52 esta se encuentra en el municipio de Coacalco de Berriozábal y cerca de los municipios de Tultitlán y Tultepec.
+</div>
+
 ## Incidencia delictiva: México
 <h4 class="title_graph">`r titulo_1`</h4>
 <div class="big_graph">
@@ -22,6 +30,7 @@ m1<-graph1
 hc_size(m1,width = 830,520)
 ```
 </div>
+
 
 ## Incidencia delictiva: México 2025
 <div class="container_col">
@@ -48,11 +57,41 @@ m4
 ```
 </div>
 
-## Incidencia delictiva: Ecatepec de Morelos (promedio mensual)
+## Incidencia delictiva: Coacalco de Berriozábal 2025 (promedio mensual)
+<div class="big_table_1">
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+coa
+```
+</div>
+
+## Incidencia delictiva: Tultepec (promedio mensual)
 <div class="big_table">
 ```{r,m5, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
 m5<-tabla3
 m5
+```
+</div>
+
+## Incidencia delictiva: Tultepec 2025 (promedio mensual)
+<div class="big_table_1">
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+tultepec
+```
+</div>
+
+
+## Incidencia delictiva: Tultitlán (promedio mensual)
+<div class="big_table">
+```{r, m7, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+m7<-tabla4
+m7
+```
+</div>
+
+## Incidencia delictiva: Tultitlán 2025 (promedio mensual)
+<div class="big_table_1">
+```{r,  echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+tultitlan
 ```
 </div>
 

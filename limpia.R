@@ -38,31 +38,31 @@ del_map_jiu<-read_xlsx("Jiutepec.xlsx", sheet = "Notas")
 #PON LA DIRECCIÓN DEL ARCHIVO QUE DESCARGASTE
 delitos<-read.csv("/Users/javierruizrubio/Downloads/IDM_NM_may25.csv", fileEncoding = "latin1")
 names(delitos)[c(1,6)]<-c("años", "Bien juridico afectado")
-delitos<-delitos %>% filter(Clave_Ent=="15" )
+delitos<-delitos %>% filter(Clave_Ent=="15")
 
 delitos0<-delitos %>% select(años, Modalidad, c(10:21)) %>%  limpia_del()     
 delitos_coa<-delitos %>% filter( Cve..Municipio=="15020") %>% select(años, Modalidad, c(10:21)) %>%  limpia_del()
-delitos_ecat<-delitos %>% filter( Cve..Municipio=="15033") %>% select(años, Modalidad, c(10:21)) %>%  limpia_del()
+delitos_tultepec<-delitos %>% filter( Cve..Municipio=="15108") %>% select(años, Modalidad, c(10:21)) %>%  limpia_del()
+delitos_tultitlan<-delitos %>% filter( Cve..Municipio=="15109") %>% select(años, Modalidad, c(10:21)) %>%  limpia_del()
 
-graph1<-delitos0 %>% group_by(mes) %>% summarise(Total=sum(delitos)) %>% 
+graph1<-delitos0 %>% group_by(mes) %>% summarise(`Promedio mensual`=round(sum(delitos)/30,0)) %>% 
         left_join(delitos_coa %>% group_by(mes) %>% summarise(`Coacalco de Berriozábal`=sum(delitos)) ) %>% 
-        left_join(delitos_ecat %>% group_by(mes) %>% summarise(`Ecatepec de Morelos`=sum(delitos)) ) %>% drop_na() %>% 
-        pivot_longer(cols =c(Total:`Ecatepec de Morelos`), names_to = c("mes1"), values_to = "delitos") %>% 
+        left_join(delitos_tultepec %>% group_by(mes) %>% summarise(`Tultepec`=sum(delitos)) ) %>% drop_na() %>% 
+        left_join(delitos_tultitlan %>% group_by(mes) %>% summarise(`Tultitlán`=sum(delitos)) ) %>% drop_na() %>% 
+        pivot_longer(cols =c(`Promedio mensual`:`Tultitlán`), names_to = c("mes1"), values_to = "delitos") %>% 
         g_line( "Incidentes", "Fecha")
 
-
-titulo_1 <-paste("Delitos 2024: Total=", delitos0 %>%suma_del(),
+titulo_1 <-paste("Delitos 2025: Total=", delitos0 %>%suma_del(),
                  ", Coacalco de Berriozábal:", delitos_coa %>%suma_del(),
-                 ", Ecatepec de Morelos:", delitos_ecat %>%suma_del())
+                 ", Tultepec:", delitos_tultepec %>%suma_del(),
+                 ", Tultitlán:", delitos_tultitlan %>%suma_del())
 
 tabla1<-delitos %>% filter( años==2025) %>% 
   select(Municipio, años, Modalidad, c(10:21)) %>% 
   limpia_del() %>% group_by(Municipio) %>% 
   summarise(n=sum(delitos, na.rm=T)) %>% arrange(desc(n)) %>% 
   mutate(por= (n)/sum(n, na.rm = T)) %>% mutate(n=accounting(n, digits = 0L)) %>% 
-  head(12) %>% mutate(Municipio=case_when(Municipio=="Tepoztl\xe1n"~"Tepoztlán",
-                                          Municipio=="Tlaltizap\xe1n de Zapata"~"Tlaltizapán de Zapata",
-                                         .default = as.character(Municipio))) 
+  head(12) 
   colnames(tabla1) <- c("Municipio", "Delitos", "Porcentaje")
   tabla1<- formattable(tabla1, 
                  align = c("l","r", "r"),
@@ -79,8 +79,15 @@ tabla1<-delitos %>% filter( años==2025) %>%
    prom_mes_jiu<-delitos_coa %>% filter(años>=2023) %>% des_anos() 
    tabla2<- arregla_tabla(prom_mes_jiu)
    
-   prom_mes_cue<-delitos_ecat  %>% filter(años>=2023)%>% des_anos() 
-   tabla3<- arregla_tabla(prom_mes_cue)
+   prom_mes_tultepec<-delitos_tultepec  %>% filter(años>=2023)%>% des_anos() 
+   tabla3<- arregla_tabla(prom_mes_tultepec)
+   
+   prom_mes_tultitlan<-delitos_tultitlan  %>% filter(años>=2023)%>% des_anos() 
+   tabla4<- arregla_tabla(prom_mes_tultitlan)
+   
+   coa<-tabla_comps("Coacalco", "15020", delitos)
+   tultepec<-tabla_comps("Tultepec", "15108", delitos)
+   tultitlan<-tabla_comps("Tultitlán", "15109", delitos)
    
 library(leaflet)
 library(leaflet.extras)
@@ -121,7 +128,7 @@ library(htmltools)
    
    rmarkdown::render("press.Rmd", output_file = "press.html",
                      params = list(graph1=graph1, titulo_1=titulo_1, tabla1=tabla1, mapa1=mapa1,
-                                   tabla2=tabla2, tabla3=tabla3, mapa_2=mapa_2))
+                                   tabla2=tabla2, tabla3=tabla3, tabla4=tabla4, mapa_2=mapa_2))
    
               
             

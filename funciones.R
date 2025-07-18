@@ -19,9 +19,13 @@ limpia_del<-function(delitos){
   return(delitos)}
 
 des_anos<-function(delitos){
-  delitos<-delitos %>% group_by(Modalidad, años) %>% summarise(n=mean(delitos, na.rm=T)) %>% arrange(desc(n)) %>% 
-    reshape2::dcast(Modalidad~años, value.var = "n", sum) %>% rowwise() %>%
-    mutate(comp=comparativo(`2025`, `2024`)) %>% mutate(comp1=comparativo(`2024`, `2023`)) %>% 
+  delitos<-delitos %>% group_by(Modalidad, años) %>% 
+    summarise(n=mean(delitos, na.rm=T)) %>% 
+    arrange(desc(n)) %>% 
+    reshape2::dcast(Modalidad~años, value.var = "n", sum) %>% 
+    rowwise() %>%
+    mutate(comp1=comparativo(`2024`, `2023`)) %>% 
+    mutate(comp=comparativo(`2025`, `2024`)) %>% 
     mutate(`2024`=accounting(`2024`, digits = 1L)) %>% 
     mutate(`2023`=accounting(`2023`, digits = 1L)) %>% 
     mutate(`2025`=accounting(`2025`, digits = 1L)) %>% 
@@ -40,7 +44,7 @@ des_anos<-function(delitos){
                              Modalidad=="Robo de coche de 4 ruedas Sin violencia"~"<b>Robo de coche de 4 ruedas Sin violencia</b>" , 
                              Modalidad=="Robo de motocicleta Con violencia"~"<b>Robo de motocicleta Con violencia</b>" ,
                              Modalidad=="Extorsión"~"<b>Extorsión</b>", .default = as.character(Modalidad)))
-  names(delitos)[c(6:7)]<-c("Var año pasado", "Var periodo anterior")
+  names(delitos)[c(6:7)]<-c("Var 2024-2023", "Var 2025-2024")
   return(delitos)}
 
 comparativo<-function(val_act, val_ant){
@@ -56,14 +60,14 @@ arregla_tabla<-function(tabla){
                    `2023` = color_bar("#d9ebba"),
                    `2024` = color_bar("#d9ebba"),
                    `2025` = color_bar("#d9ebba"),
-                   `Var año pasado` = formatter("span", 
-                                                style = ~ style(color = ifelse(`Var año pasado` <0, "green", "red")),                                    
-                                                ~ icontext(sapply(`Var año pasado`, function(x) if (x <= 0) "chevron-down" else if (x > 0) "chevron-up" else ""), `Var año pasado`)),
-                   `Var periodo anterior` = formatter("span", 
-                                                      style = ~ style(color = ifelse(`Var periodo anterior` <0, "green", "red")),         
-                                                      ~ icontext(sapply(`Var periodo anterior`, function(x) if (x <= 0) "chevron-down" else if (x > 0) "chevron-up" else ""), `Var periodo anterior`))),
+                   `Var 2024-2023` = formatter("span", 
+                                                style = ~ style(color = ifelse(`Var 2024-2023` <0, "green", "red")),                                    
+                                                ~ icontext(sapply(`Var 2024-2023`, function(x) if (x <= 0) "chevron-down" else if (x > 0) "chevron-up" else ""), `Var 2024-2023`)),
+                   `Var 2025-2024` = formatter("span", 
+                                                      style = ~ style(color = ifelse(`Var 2025-2024` <0, "green", "red")),         
+                                                      ~ icontext(sapply(`Var 2025-2024`, function(x) if (x <= 0) "chevron-down" else if (x > 0) "chevron-up" else ""), `Var 2025-2024`))),
               table.attr = 'style="font-size: 18px; line-height = 2em; ";\"')
-return(tabla)}
+return(tabla)} 
 
 suma_del<-function(delitos){
   delitos<-delitos %>%
@@ -72,3 +76,39 @@ suma_del<-function(delitos){
     pull(total_delitos) %>% format(big.mark=",")
 return(delitos)}
 
+
+tabla_comps<-function(nam, ids, delitos){#ids="15109"; nam="Tultepec"
+  tbl<-delitos %>% 
+    filter( Cve..Municipio==ids) %>% 
+    select(años, Modalidad, c(10:21)) %>% 
+    limpia_del() %>%      
+    filter(años==2025) %>% 
+    group_by(Modalidad) %>% 
+    summarise(`Coacalco de Berriozábal`= sum(delitos, na.rm=T)) %>% 
+    arrange(desc(`Coacalco de Berriozábal`)) %>% head(13) %>% 
+    left_join(  
+      delitos %>%
+        select(años, Modalidad, c(10:21)) %>% 
+        limpia_del() %>%  
+        filter(años==2025) %>%
+        group_by(Modalidad) %>% 
+        summarise(`Promedio México` = round(sum(delitos, na.rm=T)/30,0)) %>% 
+        arrange(desc(`Promedio México`)), by="Modalidad")%>% 
+    rowwise() %>%
+    mutate(Var = comparativo(cur_data()[[2]], cur_data()[[3]])) %>% 
+    mutate(Modalidad=case_when(Modalidad=="Amenazas"~ "<b>Amenazas</b>",
+                               Modalidad=="Robo de motocicleta Sin violencia"~"<b>Robo de motocicleta Sin violencia</b>",
+                               Modalidad=="Robo de coche de 4 ruedas Con violencia"~"<b>Robo de coche de 4 ruedas Sin violencia</b>" ,
+                               Modalidad=="Robo de coche de 4 ruedas Sin violencia"~"<b>Robo de coche de 4 ruedas Sin violencia</b>" , 
+                               Modalidad=="Robo de motocicleta Con violencia"~"<b>Robo de motocicleta Con violencia</b>" ,
+                               Modalidad=="Extorsión"~"<b>Extorsión</b>", .default = as.character(Modalidad)))
+  
+  names(tbl)<-c("Modalidad", nam, "Promedio", "Variación")
+  formattable(tbl, 
+              align = c("l", "r", "r", "r"),
+              list(
+                   `Variación` = formatter("span", 
+                                     style = ~ style(color = ifelse(`Variación` <0, "green", "red")),         
+                                     ~ icontext(sapply(`Variación`, function(x) if (x <= 0) "chevron-down" else if (x > 0) "chevron-up" else ""), `Variación`))),
+              table.attr = 'style="font-size: 20px; line-height = 2em; ";\"')
+  }
