@@ -16,7 +16,7 @@ shp <- st_read("/Users/javierruizrubio/Desktop/fsp/SHP-Municipios/Municipios.shp
 # write_json(shp1, "morelos.json")
 
 shp <- st_read("/Users/javierruizrubio/Desktop/fsp/SHP-Colonias") %>% st_transform( "+init=epsg:4326")
-shp<-shp %>% filter(ST_NAME=="MEXICO" & MUN_NAME== "COACALCO DE BERRIOZÁBAL") %>% 
+shp<-shp %>% filter(ST_NAME=="MEXICO" & MUN_NAME== "IXTAPALUCA") %>% 
   st_as_sf( ) %>% st_zm( drop = T, what = "ZM")
 
 black_zone<-bind_rows( 
@@ -27,16 +27,15 @@ black_zone<-bind_rows(
  shp %>% mutate(esta=case_when(grepl("TEJALPA", SETT_NAME)==T~1)) %>%  filter(esta==1))
 
 
-shp_coacalco <- st_read("/Users/javierruizrubio/Desktop/fsp/SHP-Municipios")%>% 
+shp_ixtapaluca <- st_read("/Users/javierruizrubio/Desktop/fsp/SHP-Municipios")%>% 
            st_transform( "+init=epsg:4326") %>% 
-           filter(Estado=="México" & Municipios=="Coacalco de Berriozábal") %>%
+           filter(Estado=="México" & Municipios=="Ixtapaluca") %>%
   st_as_sf( )
 
-shp1<-read_json("morelos.json")
  
-del_map_jiu<-read_xlsx("Jiutepec.xlsx", sheet = "Notas")
+del_map_jiu<-read_xlsx("/Users/javierruizrubio/Downloads/chalco e ixtapaluca.xlsx")
 #PON LA DIRECCIÓN DEL ARCHIVO QUE DESCARGASTE
-delitos<-read.csv("/Users/javierruizrubio/Downloads/IDM_NM_may25.csv", fileEncoding = "latin1")
+delitos<-read.csv("/Users/javierruizrubio/Downloads/Historico Indicadores Op final. VF_Enero-SPINS122217.xlsx", fileEncoding = "latin1")
 names(delitos)[c(1,6)]<-c("años", "Bien juridico afectado")
 delitos<-delitos %>% filter(Clave_Ent=="15")
 
@@ -96,9 +95,19 @@ library(htmltools)
    puntos<-read_sheet("https://docs.google.com/spreadsheets/d/1fnEaW2HLgCwN9QsZF6H6GogZhSnSOfO1D8nG6d718AU/edit?gid=0#gid=0") 
    puntos<-puntos %>% tidyr::separate(`lat y log`, sep=",", into = c("lat", "lon")) %>% 
        mutate(lat=as.numeric(lat), lon=as.numeric(lon))
-
+   
+   shp <- st_read("/Users/javierruizrubio/Desktop/fsp/SHP-Colonias") %>% st_transform( "+init=epsg:4326")
+   shp<-shp %>% filter(ST_NAME=="MEXICO" & (MUN_NAME== "COACALCO DE BERRIOZÁBAL" | MUN_NAME=="TULTEPEC" |  MUN_NAME=="TULTITLÁN") ) %>% 
+     st_as_sf( ) %>% st_zm( drop = T, what = "ZM")
+   
    black_zone<- shp %>% filter(SETT_NAME %in% c("FRACC LOS HEROES DE COACALCO", "EL POTRERO",
-                                                "POTRERO POPULAR", "VILLA DE LAS FLORES", "VILLA DE LAS FLORES 1RA SECC"))
+                                                "POTRERO POPULAR", "VILLA DE LAS FLORES", "VILLA DE LAS FLORES 1RA SECC",
+                                                "SIERRA GUADALUPE","SARDAÑA", "AMPL LA SARDAÑA",
+                                                "EL TESORO", "AMPL EL TESORO", "BENITO JUAREZ",
+                                                "EL MIRADOR", "LOMAS DE TULTEPEC", "LA CANTERA",
+                                                "SANTIAGO TEYAHUALCO", "SAN ANTONIO XAHUENTO", 
+                                                "SAN ANTONIO XAHUENTO"))
+   
    red_zone<-shp %>% filter(SETT_NAME %in% c("CONJUNTO HAB LOS PORTALES", "PORTALES", "CONJUNTO HAB LOS PORTALES"))
    
    mapa_2<-leaflet(width ="830px", height="520px") %>% 
@@ -109,7 +118,7 @@ library(htmltools)
                colors =  c("#000","#279e0e", "#a61717", "orange"),
                labels = c("Zonas alta incidencia", "Zonas propuestas", "Delitos reportados", "Radio 2km")) %>% 
      addMarkers( label ="San Pablo", lat=19.6328929, lng=-99.112371) %>% 
-     addPolygons(data = shp_coacalco, weight = 4, fillOpacity = 0, color = '#F135FF') %>% 
+     addPolygons(data = shp_ixtapaluca, weight = 4, fillOpacity = 0, color = '#F135FF') %>% 
      addPolygons(data = black_zone, fillColor = '#000', fillOpacity = 0.7) %>% 
      addPolygons(data = red_zone,  fillColor = '#279e0e', fillOpacity = 0.7) %>% 
      addPolygons(data = shp, weight = 2, fillOpacity = 0, color = '#007bff',  label = ~SETT_NAME,

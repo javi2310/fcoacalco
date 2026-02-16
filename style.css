@@ -131,5 +131,9 @@ aside.gdbar {
     background: #fff;
     text-align: center !important;}
   
+  .leaflet-control-layers label {
+    display: block;
+    margin-left: -85px !important;
+}
 
   

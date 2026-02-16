@@ -57,25 +57,24 @@ m4
 ```
 </div>
 
-## Incidencia delictiva: Coacalco de Berriozábal 2025 (promedio mensual)
+## Incidencia delictiva: Ixtapaluca 2025 (promedio mensual)
 <div class="big_table_1">
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
-coa
+ixtapaluca
 ```
 </div>
 
-## Incidencia delictiva: Tultepec (promedio mensual)
+## Incidencia delictiva: Chalco (promedio mensual)
 <div class="big_table">
-```{r,m5, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
-m5<-tabla3
-m5
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+chalco
 ```
 </div>
 
-## Incidencia delictiva: Tultepec 2025 (promedio mensual)
+## Incidencia delictiva: Valle de Chalco 2025 (promedio mensual)
 <div class="big_table_1">
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
-tultepec
+va_chalco
 ```
 </div>
 

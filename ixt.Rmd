@@ -1,0 +1,127 @@
+---
+title: "Incidencia delictiva:<br> Ixtapaluca - Chalco"
+author: "Seguridad Patrimonial"
+date: "2026-02-16"
+output: ioslides_presentation
+css: style.css
+fullscreen: true
+params:
+  titulo_1: NA
+  graph1: NA
+  tabla1: NA
+  mapa1: NA
+  tabla2: NA
+  tabla3: NA
+  tabla4: NA
+  mapa_2: NA
+---
+## Consideraciones técnicas: 
+<div class="container_col">
+- La información expuesta fue obtenida en el portal de datos abiertos del Gobierno de México (https://www.gob.mx/)
+- Se tienen un corte de análisis al 2 de Enero del 2026
+- La farmacia 62,66 y 156 están ubicadas dentro de los los municipios de Ixtapaluca, Valle de Chalco y Chalco respectivamente.
+</div>
+
+## Incidencia delictiva: México
+<h4 class="title_graph">`r titulo_1`</h4>
+<div class="big_graph">
+```{r,m1, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+m1<-graph1
+hc_size(m1,width = 830,520)
+```
+</div>
+
+
+## Incidencia delictiva: México 2025
+<div class="container_col">
+<div class="dbl_col" style="margin:-15px 12px 0px -4px;">
+```{r,m2, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+m2<-tabla1
+m2
+```
+</div>
+<div class="dbl_col">
+```{r,m3, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+m3<-mapa1
+hc_size(m3,width = 400,520)
+```
+</div>
+</div>
+
+
+## Incidencia delictiva: Ixtapaluca (promedio mensual)
+<div class="big_table">
+```{r,m4, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+m4<-tabla2
+m4
+```
+</div>
+
+## Incidencia delictiva: Chalco 2025 (promedio mensual)
+<div class="big_table_1">
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+tabla3
+```
+</div>
+
+## Incidencia delictiva: Valle de Chalco  (promedio mensual)
+<div class="big_table">
+```{r,m5, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+m5<-tabla4
+m5
+```
+</div>
+
+## Incidencia delictiva: Ixtapaluca 2025 (promedio mensual)
+<div class="big_table_1">
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+ixtapaluca
+```
+</div>
+
+
+## Incidencia delictiva: Chalco (promedio mensual)
+<div class="big_table">
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+chalco
+```
+</div>
+
+## Incidencia delictiva: Valle de Chalco 2025 (promedio mensual)
+<div class="big_table_1">
+```{r,  echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+va_chalco
+```
+</div>
+
+## Mapa de colonias e incidentes delictivos reportados
+<br>
+<div class="big_table">
+```{r,m6, echo = FALSE, warning = FALSE, message = FALSE, fig.align="center"}
+m6<-mapa_2
+m6
+```
+</div>
+
+## Conclusiones
+<div style="text-align:justify; margin-top: -33px"> 
+En municipio de <b>Chalco</b> se tiene un alta incidencia delictiva en el robo de  <b>Robo de motocicleta Con y Sin violencia</b>, si bien este delito bajo <b>32%</b> respecto al 2024
+se encuentran <b>115.3%</b> y <b>123.7%</b> arriba del promedio del Edo Mex.
+<br><br>
+Las zonas con <b>alta incidencia delictivas</b>:  <br>
+<b>Chalco:</b><br>
+Los Héroes de Chalco, Jardines de Chalco, Covadonga, Unión de Guadalupe y Villas Chalco.<br>
+<b>Ixtapaluca:</b><br>
+El Molino, Jiménez Cantú, Alfredo del Mazo, Cuatro Vientos, y la colonia Morelos.
+<br>
+<b>Valle de Chalco:</b><br>
+Guadalupana, San Isidro, Santa Cruz, San Miguel Xico, y la colonia Providencia.
+<br><br>
+</div>
+
+
+
+
+
+
+

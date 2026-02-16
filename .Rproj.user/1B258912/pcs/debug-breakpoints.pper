@@ -1,5 +1,21 @@
 {
     "debugBreakpointsState": {
-        "breakpoints": []
+        "breakpoints": [
+            {
+                "id": 5,
+                "path": "~/Desktop/julio/coacalco/ventas.R",
+                "line_number": 398,
+                "function_steps": "",
+                "function_name": "formato",
+                "state": 2,
+                "editor_state": 2,
+                "editor_line_number": 398,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": true,
+                "type": 0,
+                "is_package_breakpoint": false,
+                "package_name": ""
+            }
+        ]
     }
 }

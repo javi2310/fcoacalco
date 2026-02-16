@@ -93,11 +93,11 @@ g_line<-function(tabla, ytext, xtext){#tabla<- grafica_2, ytext="Cuentas", titul
   return(tabla)  }
 
 mapas<-function(del, shp1){
-  map<-highchart() %>%
-    hc_add_series_map(map=shp1, del,
-                      joinBy = "CVEGEO",
+  map<-highchart(type = "map") %>%
+    hc_add_series_map( map=shp1, del,
+                      joinBy ="CVEGEO",
                       value = "n",
-                      name = "Municipio") %>% 
+                      name = "Municipios") %>% 
     hc_tooltip(crosshairs = F, shared = T, borderWidth = 2, useHTML = TRUE, backgroundColor = "#5C666F", fillOpacity = 1, borderRadius=15,
                sort = TRUE, style = list(align = "center",color = "#EEF2F5", fontFamily = "Titillium Web"),
                headerFormat ="",
@@ -107,4 +107,4 @@ mapas<-function(del, shp1){
     hc_colorAxis(minColor = "#d9ebba", maxColor = "#000022") %>%
     hc_plotOptions(
       series = list(  borderColor = "#fff", borderWidth = 2)) 
-return(map)}
+  return(map)}
